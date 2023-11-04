@@ -5,6 +5,9 @@ resource "aws_dynamodb_table" "results-table" {
   hash_key     = "timestamp"
   range_key    = "sensor"
 
+  stream_enabled   = true
+  stream_view_type = "NEW_AND_OLD_IMAGES"
+
   attribute {
     name = "timestamp"
     type = "N"
@@ -13,12 +16,6 @@ resource "aws_dynamodb_table" "results-table" {
   attribute {
     name = "sensor"
     type = "S"
-  }
-
-
-  ttl {
-    attribute_name = "TimeToExist"
-    enabled        = false
   }
 
   tags = {

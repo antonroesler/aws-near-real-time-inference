@@ -4,6 +4,11 @@ resource "aws_kinesis_firehose_delivery_stream" "result-delivery-stream" {
   name        = "${var.APP_NAME}-results-stream-${var.ENV}"
   destination = "extended_s3"
 
+  kinesis_source_configuration {
+    kinesis_stream_arn = aws_kinesis_stream.results-stream.arn
+    role_arn           = var.FIREHOSE_ROLE
+  }
+
   extended_s3_configuration {
     role_arn   = var.FIREHOSE_ROLE
     bucket_arn = var.RESULT_BUCKET_ARN
@@ -14,7 +19,6 @@ resource "aws_kinesis_firehose_delivery_stream" "result-delivery-stream" {
 
       processors {
         type = "Lambda"
-
         parameters {
           parameter_name  = "LambdaArn"
           parameter_value = "${aws_lambda_function.result-stream-transformer.arn}:$LATEST"
@@ -25,6 +29,7 @@ resource "aws_kinesis_firehose_delivery_stream" "result-delivery-stream" {
 
 
     data_format_conversion_configuration {
+
       input_format_configuration {
         deserializer {
           hive_json_ser_de {}
@@ -38,7 +43,7 @@ resource "aws_kinesis_firehose_delivery_stream" "result-delivery-stream" {
       }
 
       schema_configuration {
-        database_name = aws_glue_catalog_table.aws_glue_catalog_table.name
+        database_name = aws_glue_catalog_database.aws_glue_catalog_database.name
         role_arn      = var.FIREHOSE_ROLE
         table_name    = aws_glue_catalog_table.aws_glue_catalog_table.name
       }

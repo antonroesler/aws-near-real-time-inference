@@ -14,3 +14,7 @@ output "glue_table" {
 output "dynamo_db_table" {
   value = aws_dynamodb_table.results-table.name
 }
+
+output "dynamo_db_table_arn" {
+  value = aws_dynamodb_table.results-table.arn
+}

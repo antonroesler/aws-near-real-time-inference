@@ -25,3 +25,11 @@ variable "GLUE_CATALOG" {
 variable "GLUE_TABLE" {
   type = string
 }
+
+variable "LAMBDA_INFERENCE_ARN" {
+  type = string
+}
+
+variable "SFN_LOG_GROUP" {
+  type = string
+}

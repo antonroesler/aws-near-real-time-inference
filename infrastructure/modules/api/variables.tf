@@ -6,6 +6,10 @@ variable "ENV" {
   type = string
 }
 
+variable "AWS_REGION" {
+  type = string
+}
+
 variable "STEP_FUNC_INVOKE_URI" {
   type = string
 }

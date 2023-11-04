@@ -13,3 +13,8 @@ output "firehose_role" {
   value = aws_iam_role.firehose_role.arn
 }
 
+
+output "api_gw_role" {
+  value = aws_iam_role.api_gw_role.arn
+}
+

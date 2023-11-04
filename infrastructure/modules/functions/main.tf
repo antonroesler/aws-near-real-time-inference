@@ -18,7 +18,13 @@ resource "aws_lambda_function" "result-stream-inference" {
 resource "aws_sfn_state_machine" "sfn_state_machine" {
   name     = "${var.APP_NAME}-state-machine-${var.ENV}"
   role_arn = var.STEP_FUNCTION_ROLE
-  type     = "EXPRESS"
+  type     = "STANDARD"
+
+  # logging_configuration {
+  #   log_destination        = "${aws_cloudwatch_log_group.sfn-logs.arn}:*"
+  #   include_execution_data = true
+  #   level                  = "ERROR"
+  # }
 
   definition = <<EOF
 {
@@ -75,3 +81,11 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
 EOF
 }
 
+resource "aws_cloudwatch_log_group" "sfn-logs" {
+  name = "${var.APP_NAME}-state-machine-logs-${var.ENV}"
+
+  tags = {
+    Environment = var.ENV
+    Application = var.APP_NAME
+  }
+}
