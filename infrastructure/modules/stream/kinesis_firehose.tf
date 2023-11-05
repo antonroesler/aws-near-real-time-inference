@@ -12,7 +12,7 @@ resource "aws_kinesis_firehose_delivery_stream" "result-delivery-stream" {
   extended_s3_configuration {
     role_arn   = var.FIREHOSE_ROLE
     bucket_arn = var.RESULT_BUCKET_ARN
-    prefix     = "results"
+    prefix     = "event-streams/results/"
 
     processing_configuration {
       enabled = "true"
@@ -74,7 +74,7 @@ resource "aws_glue_catalog_table" "aws_glue_catalog_table" {
   }
 
   storage_descriptor {
-    location      = "s3://${var.RESULT_BUCKET_NAME}/event-streams/results"
+    location      = "s3://${var.RESULT_BUCKET_NAME}/event-streams/results/${var.YEAR}"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
@@ -105,5 +105,14 @@ resource "aws_glue_catalog_table" "aws_glue_catalog_table" {
       type = "double"
 
     }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "firehose_logs" {
+  name = "${var.APP_NAME}-firehose-logs-${var.ENV}"
+
+  tags = {
+    Environment = var.ENV
+    Application = var.APP_NAME
   }
 }

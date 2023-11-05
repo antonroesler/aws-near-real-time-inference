@@ -1,16 +1,20 @@
 # IAM; Keys; Security groups
 
 module "security" {
-  source               = "../modules/security"
-  APP_NAME             = var.APP_NAME
-  ENV                  = var.ENV
-  RESULT_BUCKET_ARN    = module.storage.result_bucket_arn
-  DYNAMO_DB            = module.stream.dynamo_db_table_arn
-  GLUE_DATABASE        = module.stream.glue_database
-  GLUE_TABLE           = module.stream.glue_table
-  GLUE_CATALOG         = module.stream.glue_catalog
-  LAMBDA_INFERENCE_ARN = module.functions.lambda_inference_arn
-  SFN_LOG_GROUP        = module.functions.sfn_log_group
+  source                 = "../modules/security"
+  APP_NAME               = var.APP_NAME
+  AWS_REGION             = var.AWS_REGION
+  ENV                    = var.ENV
+  RESULT_BUCKET_ARN      = module.storage.result_bucket_arn
+  DYNAMO_DB              = module.stream.dynamo_db_table_arn
+  GLUE_DATABASE          = module.stream.glue_database
+  GLUE_TABLE             = module.stream.glue_table
+  LAMBDA_INFERENCE_ARN   = module.functions.lambda_inference_arn
+  SFN_LOG_GROUP          = module.functions.sfn_log_group
+  SFN_ARN                = module.functions.invoke_arn
+  FIREHOSE_LOG_GROUP_ARN = module.stream.firehose_log_group_arn
+  KINESIS_STREAM_ARN     = module.stream.kinesis_stream_arn
+  TRANSFORMER_LAMBDA_ARN = module.stream.transformer_lamnda_arn
 }
 
 
@@ -43,6 +47,7 @@ module "stream" {
   RESULT_BUCKET_NAME      = module.storage.result_bucket_name
   TRANSFORMER_LAMBDA_ROLE = module.security.lambda_transformer_role
   FIREHOSE_ROLE           = module.security.firehose_role
+  YEAR                    = "2023"
 }
 
 module "api" {

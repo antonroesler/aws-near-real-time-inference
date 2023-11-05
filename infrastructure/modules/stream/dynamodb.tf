@@ -1,5 +1,5 @@
 # DynamoDB
-resource "aws_dynamodb_table" "results-table" {
+resource "aws_dynamodb_table" "results_table" {
   name         = "${var.APP_NAME}-results-stream-${var.ENV}"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "timestamp"

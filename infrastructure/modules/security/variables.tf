@@ -18,10 +18,6 @@ variable "GLUE_DATABASE" {
   type = string
 }
 
-variable "GLUE_CATALOG" {
-  type = string
-}
-
 variable "GLUE_TABLE" {
   type = string
 }
@@ -31,5 +27,26 @@ variable "LAMBDA_INFERENCE_ARN" {
 }
 
 variable "SFN_LOG_GROUP" {
+  type = string
+}
+
+variable "SFN_ARN" {
+  type        = string
+  description = "ARN of the stepfunction state machine"
+}
+
+variable "FIREHOSE_LOG_GROUP_ARN" {
+  type = string
+}
+
+variable "KINESIS_STREAM_ARN" {
+  type = string
+}
+
+variable "AWS_REGION" {
+  type = string
+}
+
+variable "TRANSFORMER_LAMBDA_ARN" {
   type = string
 }

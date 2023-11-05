@@ -21,3 +21,7 @@ variable "TRANSFORMER_LAMBDA_ROLE" {
 variable "RESULT_BUCKET_NAME" {
   type = string
 }
+
+variable "YEAR" {
+  type = string
+}

@@ -17,4 +17,3 @@ output "firehose_role" {
 output "api_gw_role" {
   value = aws_iam_role.api_gw_role.arn
 }
-

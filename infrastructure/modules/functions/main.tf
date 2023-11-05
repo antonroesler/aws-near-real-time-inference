@@ -20,12 +20,6 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
   role_arn = var.STEP_FUNCTION_ROLE
   type     = "STANDARD"
 
-  # logging_configuration {
-  #   log_destination        = "${aws_cloudwatch_log_group.sfn-logs.arn}:*"
-  #   include_execution_data = true
-  #   level                  = "ERROR"
-  # }
-
   definition = <<EOF
 {
   "Comment": "A description of my state machine",

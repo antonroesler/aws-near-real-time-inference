@@ -130,13 +130,160 @@ resource "aws_iam_role" "firehose_role" {
   assume_role_policy = data.aws_iam_policy_document.firehose_assume_policy.json
 }
 
+#########
 data "aws_iam_policy_document" "firehose_iam_policy" {
   statement {
+    sid    = ""
+    effect = "Allow"
+
+    resources = [
+      var.GLUE_TABLE,
+      var.GLUE_DATABASE,
+    ]
+
+    actions = [
+      "glue:GetTable",
+      "glue:GetTableVersion",
+      "glue:GetTableVersions",
+    ]
+  }
+
+  statement {
+    sid       = ""
     effect    = "Allow"
-    resources = ["*"]
-    actions   = ["*"]
+    resources = ["arn:aws:kafka:${var.AWS_REGION}::cluster/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"]
+
+    actions = [
+      "kafka:GetBootstrapBrokers",
+      "kafka:DescribeCluster",
+      "kafka:DescribeClusterV2",
+      "kafka-cluster:Connect",
+    ]
+  }
+
+  statement {
+    sid       = ""
+    effect    = "Allow"
+    resources = ["arn:aws:kafka:${var.AWS_REGION}::topic/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"]
+
+    actions = [
+      "kafka-cluster:DescribeTopic",
+      "kafka-cluster:DescribeTopicDynamicConfiguration",
+      "kafka-cluster:ReadData",
+    ]
+  }
+
+  statement {
+    sid       = ""
+    effect    = "Allow"
+    resources = ["arn:aws:kafka:${var.AWS_REGION}::group/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/*"]
+    actions   = ["kafka-cluster:DescribeGroup"]
+  }
+
+  statement {
+    sid    = ""
+    effect = "Allow"
+
+    resources = [
+      var.RESULT_BUCKET_ARN,
+      "${var.RESULT_BUCKET_ARN}/*",
+    ]
+
+    actions = [
+      "s3:AbortMultipartUpload",
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:PutObject",
+    ]
+  }
+
+  statement {
+    sid       = ""
+    effect    = "Allow"
+    resources = ["${var.TRANSFORMER_LAMBDA_ARN}:$LATEST"]
+
+    actions = [
+      "lambda:InvokeFunction",
+      "lambda:GetFunctionConfiguration",
+    ]
+  }
+
+  statement {
+    sid       = ""
+    effect    = "Allow"
+    resources = ["arn:aws:kms:${var.AWS_REGION}::key/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"]
+
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["s3.${var.AWS_REGION}.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+
+      values = [
+        "arn:aws:s3:::%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/*",
+        "arn:aws:s3:::%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%",
+      ]
+    }
+  }
+
+  statement {
+    sid    = ""
+    effect = "Allow"
+
+    resources = [
+      "${var.FIREHOSE_LOG_GROUP_ARN}:*",
+      # "arn:aws:logs:::log-group:%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%:log-stream:*",
+    ]
+
+    actions = ["logs:PutLogEvents"]
+  }
+
+  statement {
+    sid       = ""
+    effect    = "Allow"
+    resources = [var.KINESIS_STREAM_ARN]
+
+    actions = [
+      "kinesis:DescribeStream",
+      "kinesis:GetShardIterator",
+      "kinesis:GetRecords",
+      "kinesis:ListShards",
+    ]
+  }
+
+  statement {
+    sid       = ""
+    effect    = "Allow"
+    resources = ["arn:aws:kms:${var.AWS_REGION}::key/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"]
+    actions   = ["kms:Decrypt"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["kinesis.${var.AWS_REGION}.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:kinesis:arn"
+      values   = [var.KINESIS_STREAM_ARN]
+    }
   }
 }
+
+
+#########
 
 resource "aws_iam_policy" "firehose_iam" {
   name   = "${var.APP_NAME}-firehose-policy-${var.ENV}"
@@ -167,11 +314,12 @@ resource "aws_iam_role" "api_gw_role" {
   assume_role_policy = data.aws_iam_policy_document.api_gw_assume_policy.json
 }
 
+
 data "aws_iam_policy_document" "api_gw_iam_policy" {
   statement {
     effect    = "Allow"
-    resources = ["*"]
-    actions   = ["*"]
+    resources = [var.SFN_ARN]
+    actions   = ["states:StartExecution"]
   }
 }
 
@@ -180,7 +328,12 @@ resource "aws_iam_policy" "api_gw_iam" {
   policy = data.aws_iam_policy_document.api_gw_iam_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "api_gw_attach" {
+resource "aws_iam_role_policy_attachment" "api_gw_attach_sfn" {
   role       = aws_iam_role.api_gw_role.name
   policy_arn = aws_iam_policy.api_gw_iam.arn
+}
+
+resource "aws_iam_role_policy_attachment" "api_gw_attach_cloud_watch" {
+  role       = aws_iam_role.api_gw_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
