@@ -50,3 +50,7 @@ variable "AWS_REGION" {
 variable "TRANSFORMER_LAMBDA_ARN" {
   type = string
 }
+
+variable "MODEL_NAME_PREFIX" {
+  type = string
+}

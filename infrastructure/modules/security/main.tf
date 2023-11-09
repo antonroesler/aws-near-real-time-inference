@@ -1,5 +1,5 @@
 # Inference Role
-data "aws_iam_policy_document" "lambda_assume_role" {
+data "aws_iam_policy_document" "lambda_inference_role" {
   statement {
     effect = "Allow"
 
@@ -14,13 +14,13 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 
 resource "aws_iam_role" "lambda_inference_role" {
   name               = "${var.APP_NAME}-lambda-inference-${var.ENV}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_inference_role.json
 }
 
 data "aws_iam_policy_document" "allow_inference" {
   statement {
     effect    = "Allow"
-    resources = ["*"] # TODO, allow only specific endpoints to be invoked
+    resources = ["arn:aws:sagemaker:::endpoint/${var.MODEL_NAME_PREFIX}*"]
     actions   = ["sagemaker:InvokeEndpoint"]
   }
   statement {
@@ -90,13 +90,13 @@ resource "aws_iam_role_policy_attachment" "sfn_attach_dynamo_put" {
 # Transformer Role
 resource "aws_iam_role" "lambda_transformer_role" {
   name               = "${var.APP_NAME}-lambda-transformer-${var.ENV}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.allow_transform.json
 }
 
 data "aws_iam_policy_document" "allow_transform" {
   statement {
     effect    = "Allow"
-    resources = ["*"] # TODO, allow only specific endpoints to be invoked
+    resources = ["*"]
     actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
   }
 }

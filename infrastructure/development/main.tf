@@ -15,6 +15,7 @@ module "security" {
   FIREHOSE_LOG_GROUP_ARN = module.stream.firehose_log_group_arn
   KINESIS_STREAM_ARN     = module.stream.kinesis_stream_arn
   TRANSFORMER_LAMBDA_ARN = module.stream.transformer_lamnda_arn
+  MODEL_NAME_PREFIX      = var.MODEL_NAME_PREFIX
 }
 
 

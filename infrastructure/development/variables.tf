@@ -18,3 +18,7 @@ variable "BACKEND_BUCKET" {
 variable "BACKEND_DYNAMODB" {
   default = "tf-signal-detection-lock-db"
 }
+
+variable "MODEL_NAME_PREFIX" {
+  default = "serverless"
+}
