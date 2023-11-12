@@ -43,14 +43,6 @@ EOF
 
 }
 
-resource "aws_api_gateway_deployment" "api" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.api.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
@@ -74,9 +66,18 @@ resource "aws_api_gateway_integration_response" "workflow_response" {
   # Transforms the backend JSON response to XML
   response_templates = {
     "application/json" = <<EOF
-{
-"status" : "accepted",
-}
+  {
+    "status" : "accepted"
+  }
 EOF
   }
+}
+
+
+resource "aws_api_gateway_deployment" "api" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }

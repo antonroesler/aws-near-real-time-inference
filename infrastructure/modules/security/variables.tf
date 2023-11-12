@@ -1,8 +1,15 @@
 variable "APP_NAME" {
   type = string
 }
+variable "ACCOUNT_ID" {
+  type = string
+}
 
 variable "ENV" {
+  type = string
+}
+
+variable "AWS_REGION" {
   type = string
 }
 
@@ -40,10 +47,6 @@ variable "FIREHOSE_LOG_GROUP_ARN" {
 }
 
 variable "KINESIS_STREAM_ARN" {
-  type = string
-}
-
-variable "AWS_REGION" {
   type = string
 }
 

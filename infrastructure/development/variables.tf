@@ -22,3 +22,7 @@ variable "BACKEND_DYNAMODB" {
 variable "MODEL_NAME_PREFIX" {
   default = "serverless"
 }
+
+variable "YEAR" {
+  default = "2023"
+}

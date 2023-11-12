@@ -11,6 +11,7 @@ resource "aws_lambda_function" "result-stream-inference" {
   role          = var.INFERENCE_LAMBDA_ROLE
   handler       = "main.lambda_handler"
   runtime       = "python3.11"
+  timeout       = 50
 }
 
 # Step Functions State Machine

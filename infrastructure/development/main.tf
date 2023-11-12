@@ -1,5 +1,7 @@
-# IAM; Keys; Security groups
 
+data "aws_caller_identity" "current" {}
+
+# IAM; Keys; Security groups
 module "security" {
   source                 = "../modules/security"
   APP_NAME               = var.APP_NAME
@@ -16,6 +18,7 @@ module "security" {
   KINESIS_STREAM_ARN     = module.stream.kinesis_stream_arn
   TRANSFORMER_LAMBDA_ARN = module.stream.transformer_lamnda_arn
   MODEL_NAME_PREFIX      = var.MODEL_NAME_PREFIX
+  ACCOUNT_ID             = data.aws_caller_identity.current.account_id
 }
 
 
@@ -48,7 +51,7 @@ module "stream" {
   RESULT_BUCKET_NAME      = module.storage.result_bucket_name
   TRANSFORMER_LAMBDA_ROLE = module.security.lambda_transformer_role
   FIREHOSE_ROLE           = module.security.firehose_role
-  YEAR                    = "2023"
+  YEAR                    = var.YEAR
 }
 
 module "api" {

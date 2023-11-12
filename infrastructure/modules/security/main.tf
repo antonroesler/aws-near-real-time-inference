@@ -1,5 +1,5 @@
 # Inference Role
-data "aws_iam_policy_document" "lambda_inference_role" {
+data "aws_iam_policy_document" "lambda_allow_assume_policy" {
   statement {
     effect = "Allow"
 
@@ -14,13 +14,13 @@ data "aws_iam_policy_document" "lambda_inference_role" {
 
 resource "aws_iam_role" "lambda_inference_role" {
   name               = "${var.APP_NAME}-lambda-inference-${var.ENV}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_inference_role.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_allow_assume_policy.json
 }
 
 data "aws_iam_policy_document" "allow_inference" {
   statement {
     effect    = "Allow"
-    resources = ["arn:aws:sagemaker:::endpoint/${var.MODEL_NAME_PREFIX}*"]
+    resources = ["arn:aws:sagemaker:${var.AWS_REGION}:${var.ACCOUNT_ID}:endpoint/${var.MODEL_NAME_PREFIX}*"]
     actions   = ["sagemaker:InvokeEndpoint"]
   }
   statement {
@@ -90,7 +90,7 @@ resource "aws_iam_role_policy_attachment" "sfn_attach_dynamo_put" {
 # Transformer Role
 resource "aws_iam_role" "lambda_transformer_role" {
   name               = "${var.APP_NAME}-lambda-transformer-${var.ENV}"
-  assume_role_policy = data.aws_iam_policy_document.allow_transform.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_allow_assume_policy.json
 }
 
 data "aws_iam_policy_document" "allow_transform" {
@@ -139,6 +139,7 @@ data "aws_iam_policy_document" "firehose_iam_policy" {
     resources = [
       var.GLUE_TABLE,
       var.GLUE_DATABASE,
+      "arn:aws:glue:eu-central-1:847994532797:catalog",
     ]
 
     actions = [
